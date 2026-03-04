@@ -36,6 +36,6 @@
 ### Technology Stack
 - Next.js (with TypeScript)
 - Tailwind CSS
-- Database: [To be determined, e.g., PostgreSQL, MongoDB]
-- ORM: [To be determined, e.g., Prisma, Drizzle]
+- Database: Vercel Postgres
+- ORM: Prisma (Installed)
 - Authentication Library: [To be determined, e.g., NextAuth.js]
