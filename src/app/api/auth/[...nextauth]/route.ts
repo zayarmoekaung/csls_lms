@@ -1,12 +1,15 @@
 import NextAuth from "next-auth";
 import type { NextAuthOptions, DefaultSession } from "next-auth";
 import type { JWT } from "next-auth/jwt";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/prisma';
 
 declare module "next-auth" {
   interface Session {
     user: {
+      id: string;
       role?: string;
     } & DefaultSession["user"];
   }
@@ -14,50 +17,73 @@ declare module "next-auth" {
 
 declare module "next-auth/jwt" {
   interface JWT {
+    id: string;
     role?: string;
   }
 }
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    // Configure your providers here, e.g.,
-    // CredentialsProvider({
-    //   name: "Credentials",
-    //   credentials: {
-    //     email: { label: "Email", type: "text" },
-    //     password: { label: "Password", type: "password" },
-    //   },
-    //   async authorize(credentials, req) {
-    //     // Add logic here to look up the user from the credentials provided
-    //     // For now, returning null
-    //     return null;
-    //   }
-    // })
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email", placeholder: "jsmith@example.com" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null; // No credentials provided
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user || !user.hashedPassword) {
+          return null; // User not found or no hashed password
+        }
+
+        const isValidPassword = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword
+        );
+
+        if (!isValidPassword) {
+          return null; // Invalid password
+        }
+
+        // Return user object, it will be saved in the JWT
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          role: user.role, // Include role in the returned user object
+        };
+      },
+    }),
   ],
-  // Add your session and callback configurations here
   session: {
     strategy: "jwt",
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        // Fetch user from DB to get role if not already in user object
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { role: true },
-        });
-        if (dbUser && dbUser.role) {
-          token.role = dbUser.role;
-        }
+        token.id = user.id; // Add user ID to token
+        token.role = user.role; // Add role to token
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token.role) {
-        session.user.role = token.role;
+      if (session.user) {
+        session.user.id = token.id; // Add user ID to session
+        session.user.role = token.role; // Add role to session
       }
       return session;
     },
+  },
+  pages: {
+    signIn: "/signin",
   },
 };
 

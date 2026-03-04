@@ -18,7 +18,9 @@ Implement secure user authentication for CSLS using NextAuth.js.
     - Set `NEXTAUTH_SECRET` (generate a strong secret).
     - If using other providers, configure their respective client IDs and secrets.
 
-4.  **Database Integration (for Credentials Provider):** (Completed)
+4.  **Database Integration (for Credentials Provider):** (Completed and Verified - Fixed Prisma Client Initialization)
+    - Implemented a Prisma Client singleton pattern using `@prisma/adapter-pg` in `src/lib/prisma.ts`.
+    - Updated `src/app/api/auth/[...nextauth]/route.ts` to use the singleton Prisma Client and extended NextAuth.js types for roles.
     - Implement logic to verify user credentials against the database.
     - Hash passwords securely (e.g., using bcrypt).
 
