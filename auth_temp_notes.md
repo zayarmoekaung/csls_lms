@@ -22,16 +22,16 @@ Implement secure user authentication for CSLS using NextAuth.js.
     - Implement logic to verify user credentials against the database.
     - Hash passwords securely (e.g., using bcrypt).
 
-5.  **Create Sign-in/Sign-up Pages:**
+5.  **Create Sign-in/Sign-up Pages:** (Placeholder Pages Created)
     - Develop UI for user login and registration forms.
     - Implement client-side validation.
 
-6.  **Protect Routes:**
+6.  **Protect Routes:** (Implemented Middleware)
     - Use NextAuth.js middleware or `getSession` / `useSession` hooks to protect routes based on user authentication status and roles.
 
-7.  **Logout Functionality:**
+7.  **Logout Functionality:** (Implemented)
     - Implement a logout mechanism.
 
-8.  **Role-Based Access Control (RBAC) Integration:**
+8.  **Role-Based Access Control (RBAC) Integration:** (Implemented)
     - Extend NextAuth.js session to include user roles.
     - Implement checks in middleware or server-side functions to restrict access based on roles.

@@ -13,6 +13,7 @@ model User {
   emailVerified DateTime?
   image         String?
   hashedPassword String?
+  role           String? // e.g., "admin", "teacher", "student"
 
   accounts      Account[]
   sessions      Session[]

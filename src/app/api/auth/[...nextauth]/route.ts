@@ -1,6 +1,11 @@
-
 import NextAuth from "next-auth";
 import type { NextAuthOptions } from "next-auth";
+
+// Temporarily import PrismaClient here for direct database interaction in callbacks
+// In a larger application, consider abstracting this or using a dedicated ORM service
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -23,12 +28,25 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    // async jwt({ token, user }) {
-    //   return token;
-    // },
-    // async session({ session, token }) {
-    //   return session;
-    // },
+    async jwt({ token, user }) {
+      if (user) {
+        // Fetch user from DB to get role if not already in user object
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { role: true },
+        });
+        if (dbUser) {
+          token.role = dbUser.role;
+        }
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user && token.role) {
+        session.user.role = token.role;
+      }
+      return session;
+    },
   },
 };
 
