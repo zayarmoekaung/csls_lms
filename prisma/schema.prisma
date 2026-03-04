@@ -14,6 +14,7 @@ model User {
   image         String?
   hashedPassword String?
   role           String? // e.g., "admin", "teacher", "student"
+  status         String? @default("active") // e.g., "active", "suspended", "deleted"
 
   accounts      Account[]
   sessions      Session[]
