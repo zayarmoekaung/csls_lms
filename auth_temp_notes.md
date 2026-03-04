@@ -18,7 +18,7 @@ Implement secure user authentication for CSLS using NextAuth.js.
     - Set `NEXTAUTH_SECRET` (generate a strong secret).
     - If using other providers, configure their respective client IDs and secrets.
 
-4.  **Database Integration (for Credentials Provider):** (Schema Defined)
+4.  **Database Integration (for Credentials Provider):** (Completed)
     - Implement logic to verify user credentials against the database.
     - Hash passwords securely (e.g., using bcrypt).
 
