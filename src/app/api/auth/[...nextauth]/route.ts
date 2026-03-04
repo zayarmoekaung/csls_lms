@@ -1,11 +1,22 @@
 import NextAuth from "next-auth";
-import type { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions, DefaultSession } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '@/lib/prisma'
 
-const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL,
-});
+declare module "next-auth" {
+  interface Session {
+    user: {
+      role?: string;
+    } & DefaultSession["user"];
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    role?: string;
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -35,7 +46,7 @@ export const authOptions: NextAuthOptions = {
           where: { id: user.id },
           select: { role: true },
         });
-        if (dbUser) {
+        if (dbUser && dbUser.role) {
           token.role = dbUser.role;
         }
       }
