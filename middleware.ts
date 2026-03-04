@@ -8,19 +8,19 @@ export default withAuth(
     const token = req.nextauth.token;
     const pathname = req.nextUrl.pathname;
 
-    // Example: Protect /admin route
+    // Protect /admin route: Only 'admin' role allowed
     if (pathname.startsWith("/admin") && token?.role !== "admin") {
       return NextResponse.redirect(new URL("/", req.url)); // Redirect to home if not admin
     }
 
-    // Example: Protect /teacher route
-    if (pathname.startsWith("/teacher") && token?.role !== "teacher") {
-      return NextResponse.redirect(new URL("/", req.url)); // Redirect to home if not teacher
+    // Protect /teacher route: Only 'teacher' role allowed (or admin)
+    if (pathname.startsWith("/teacher") && (token?.role !== "teacher" && token?.role !== "admin")) {
+      return NextResponse.redirect(new URL("/", req.url)); // Redirect to home if not teacher or admin
     }
 
-    // Example: Protect /student route
-    if (pathname.startsWith("/student") && token?.role !== "student") {
-      return NextResponse.redirect(new URL("/", req.url)); // Redirect to home if not student
+    // Protect /student route: Only 'student' role allowed (or admin/teacher)
+    if (pathname.startsWith("/student") && (token?.role !== "student" && token?.role !== "teacher" && token?.role !== "admin")) {
+      return NextResponse.redirect(new URL("/", req.url)); // Redirect to home if not student, teacher, or admin
     }
 
     return NextResponse.next();
