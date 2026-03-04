@@ -1,11 +1,11 @@
 import NextAuth from "next-auth";
 import type { NextAuthOptions } from "next-auth";
 
-// Temporarily import PrismaClient here for direct database interaction in callbacks
-// In a larger application, consider abstracting this or using a dedicated ORM service
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL,
+});
 
 export const authOptions: NextAuthOptions = {
   providers: [
